@@ -1,29 +1,36 @@
-import csv
-data=[]
-path = input()
-def csvinput(path, column='',out=False):
-    with open(rf'{path}', newline='') as csvfile:
-        rows = csv.reader(csvfile, delimiter=',')
-        for row in rows:    
-            data.append(row)
-csvinput(path)
-def val_type():
-    numerical = []
-    text = []
-    for i in range(len(data[1])):
-        is_num = False
+import csv,json,statistics
+data = []
+class cli:
+    def csvinput(path, column='',out=False):
+        with open(rf'{path}', newline='') as csvfile:
+            rows = csv.reader(csvfile, delimiter=',')
+            for row in rows:    
+                data.append(row)
+    def is_numerical(column):
+        is_num = True
         for j in range(1,len(data)):
             try:
-                float(data[i][j])
-            except:
+                data[j][column] = float(data[j][column])
+            except ValueError:
                 is_num = False
-                pass
+                return False
             else: 
                 is_num = True
         if is_num == True:
-            numerical.append(i)
-        else:
-            text.append(i)
-    return numerical, text
-def sort_num():
-    for index in :
+            return is_num
+    def sort(column):
+        if cli.is_numerical(column)==True:
+            col = [row[column] for row in data[1:]]
+            print("Количество значений:",len(col))
+            print("Минимальное значение:", min(col))
+            print("Максимальное значение:", max(col))
+            print("Среднее арифметическое:",(sum(col)/len(col)))
+            print("Медиана:",statistics.median(col))
+    def __init__(self,path,kw):
+        cli.csvinput(path)
+        try:
+            column = data[0].index(kw)
+        except:
+            print("wrong index")
+        cli.sort(column)
+a = cli(input(),input())
