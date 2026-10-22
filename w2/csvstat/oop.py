@@ -1,36 +1,71 @@
-import csv,json,statistics
-data = []
+import csv,json,statistics,collections
+
 class cli:
     def csvinput(path, column='',out=False):
-        with open(rf'{path}', newline='') as csvfile:
-            rows = csv.reader(csvfile, delimiter=',')
-            for row in rows:    
-                data.append(row)
-    def is_numerical(column):
+        data = []
+        try:
+            with open(rf'{path}', newline='') as csvfile:
+                rows = csv.reader(csvfile, delimiter=',')
+                for row in rows:    
+                    data.append(row)
+            if len(data)==0:
+                print("Empty file!")
+                exit()
+        except FileNotFoundError:
+            print("File not found")
+            exit()
+        return(data)
+    def is_numerical(column,data):
+        novalue = 0
+        n = 1
         is_num = True
-        for j in range(1,len(data)):
+        while n != len(data):
             try:
-                data[j][column] = float(data[j][column])
+                data[n][column] = float(data[n][column])
             except ValueError:
-                is_num = False
-                return False
+                if data[n][column]=='':
+                    del data[n]
+                    novalue+=1
+                    n-=1
+                else:   
+                    is_num = False
+                    return [is_num,novalue]
+            except IndexError:
+                return [is_num,novalue]
             else: 
                 is_num = True
-        if is_num == True:
-            return is_num
-    def sort(column):
-        if cli.is_numerical(column)==True:
+                n+=1
+        return [is_num,novalue]
+    def sort(column,data):
+        testr = cli.is_numerical(column, data)
+        if testr[0]==True:
             col = [row[column] for row in data[1:]]
-            print("Количество значений:",len(col))
-            print("Минимальное значение:", min(col))
-            print("Максимальное значение:", max(col))
-            print("Среднее арифметическое:",(sum(col)/len(col)))
-            print("Медиана:",statistics.median(col))
+            return  {
+            "Количество значений:": len(col),
+            "Минимальное значение": min(col),
+            "Максимальное значение:": max(col),
+            "Среднее арифметическое:": sum(col)/len(col),
+            "Медиана:": statistics.median(col),
+            "Строк без значений:":testr[1]
+            }
+        else:
+            col = [row[column] for row in data[1:]]
+            return {
+            "Количество значений:":len(col),
+            "Количество уникальных:": len(set(col)),
+            "5 самых популярных:": collections.Counter(col).most_common(5),
+            "Строк без значений:":testr[1],
+            }
+
+ 
     def __init__(self,path,kw):
-        cli.csvinput(path)
         try:
+            data = cli.csvinput(path)
             column = data[0].index(kw)
-        except:
-            print("wrong index")
-        cli.sort(column)
+            global result
+            result = cli.sort(column,data)
+        except ValueError:
+            print("No such index!")
+            exit()
 a = cli(input(),input())
+print(result)
