@@ -44,8 +44,7 @@ def q4(a):
     return(is_palindrome)
 
 def q5(a):
-    a = json.loads(a)
-    a = json.dumps(a)
+    
     b = {}
     ap = sum(a.values())/len(a)
     for product in a:
